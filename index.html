@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FTP Adventure Lite</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Roboto', sans-serif;
+            background: linear-gradient(to right, #e3f2fd, #bbdefb);
+            color: #333;
+            text-align: center;
+            padding: 20px;
+            min-height: 100vh;
+        }
+
+        #game-container {
+            margin: 0 auto;
+            padding: 30px;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+            width: 320px;
+            transition: transform 0.3s;
+        }
+
+        header {
+            margin-bottom: 20px;
+        }
+
+        h1 {
+            font-size: 32px;
+            color: #1976d2;
+            text-shadow: 1px 1px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        #level-container {
+            margin: 20px 0;
+        }
+
+        #level {
+            margin: 20px 0;
+        }
+
+        #lives {
+            font-size: 20px;
+            margin-bottom: 10px;
+            font-weight: bold;
+            color: #d32f2f;
+        }
+
+        ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        li {
+            background-color: #1976d2;
+            color: white;
+            padding: 12px;
+            margin: 5px 0;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.2s;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        }
+
+        li:hover {
+            background-color: #1565c0;
+            transform: translateY(-2px);
+        }
+
+        button {
+            padding: 12px 24px;
+            border: none;
+            background-color: #28a745;
+            color: white;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 20px;
+            font-size: 18px;
+            transition: background-color 0.3s, transform 0.2s;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        button:hover {
+            background-color: #218838;
+            transform: translateY(-2px);
+        }
+
+        footer {
+            margin-top: 20px;
+            font-size: 14px;
+            color: #666;
+        }
+
+        .correct {
+            background-color: #4caf50;
+            animation: scale-up 0.5s forwards;
+        }
+
+        .incorrect {
+            background-color: #f44336;
+            animation: scale-up 0.5s forwards;
+        }
+
+        @keyframes scale-up {
+            from {
+                transform: scale(1);
+            }
+            to {
+                transform: scale(1.1);
+            }
+        }
+    </style>
+</head>
+<body>
+    <main id="game-container">
+        <header>
+            <h1>FTP Adventure Lite</h1>
+        </header>
+        <section id="lives">Lives: 3</section>
+        <section id="level-container">
+            <div id="level"></div>
+        </section>
+        <button id="next-btn" onclick="nextLevel()">Next</button>
+        <footer>
+            <p>© 2024 FTP Adventure. All rights reserved.</p>
+        </footer>
+    </main>
+    <script>
+        let currentLevel = 0;
+        let lives = 3;
+        const levels = [
+            {
+                question: "What does FTP stand for?",
+                options: ["File Transfer Protocol", "Fast Transfer Protocol", "File Transfer Process"],
+                answer: 0
+            },
+            {
+                question: "What do you need to connect to an FTP server?",
+                options: ["Browser", "FTP Client", "Text Editor"],
+                answer: 1
+            },
+            {
+                question: "What is the first step to upload files?",
+                options: ["Connect to the server", "Create a website", "Test the website"],
+                answer: 0
+            },
+            {
+                question: "Which protocol is commonly used to transfer files securely?",
+                options: ["FTP", "SFTP", "HTTP"],
+                answer: 1
+            },
+            {
+                question: "Which of the following is a popular FTP client?",
+                options: ["FileZilla", "WordPress", "GitHub"],
+                answer: 0
+            },
+            {
+                question: "What port is typically used for FTP?",
+                options: ["21", "22", "80"],
+                answer: 0
+            },
+            {
+                question: "What does the 'P' in FTP signify?",
+                options: ["Protocol", "Process", "Permission"],
+                answer: 0
+            },
+            {
+                question: "Which command is used to upload a file in FTP?",
+                options: ["GET", "PUT", "POST"],
+                answer: 1
+            },
+            {
+                question: "Which type of authentication is often used in FTP?",
+                options: ["Password", "Token", "None"],
+                answer: 0
+            },
+            {
+                question: "What does passive mode do in FTP?",
+                options: ["Increases speed", "Establishes connection differently", "Encrypts data"],
+                answer: 1
+            }
+        ];
+
+        function displayLevel() {
+            const level = levels[currentLevel];
+            const optionsHtml = level.options.map((option, index) => `
+                <li onclick="checkAnswer(${index})">${option}</li>
+            `).join('');
+            document.getElementById("level").innerHTML = `
+                <h2>${level.question}</h2>
+                <ul>${optionsHtml}</ul>
+            `;
+            updateLivesDisplay();
+        }
+
+        function checkAnswer(selected) {
+            const correctAnswer = levels[currentLevel].answer;
+            const options = document.querySelectorAll("li");
+            if (selected === correctAnswer) {
+                options[selected].classList.add("correct");
+                alert("Correct! Moving to the next level.");
+                currentLevel++;
+                if (currentLevel < levels.length) {
+                    setTimeout(displayLevel, 500);
+                } else {
+                    document.getElementById("level").innerHTML = "<h2>Congratulations! You've completed the game!</h2>";
+                    document.getElementById("next-btn").style.display = "none";
+                }
+            } else {
+                lives--;
+                options[selected].classList.add("incorrect");
+                alert(`Incorrect! You have ${lives} lives left.`);
+                if (lives > 0) {
+                    setTimeout(displayLevel, 500);
+                } else {
+                    document.getElementById("level").innerHTML = "<h2>Game Over! You've run out of lives.</h2>";
+                    document.getElementById("next-btn").style.display = "none";
+                }
+            }
+        }
+
+        function updateLivesDisplay() {
+            document.getElementById("lives").innerHTML = `Lives: ${lives}`;
+        }
+
+        // Start the game
+        displayLevel();
+    </script>
+</body>
+</html>
